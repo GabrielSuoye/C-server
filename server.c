@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+/*
+======== OLD IMPLEMENTATION ==========
 char *content_type(char *filename) {
   char *dot = strrchr(filename, '.');
   if (dot == NULL)
@@ -22,6 +24,34 @@ char *content_type(char *filename) {
   if (strcmp(dot, ".jpeg") == 0)
     return "image/jpeg";
   return "text/plain";
+}
+*/
+
+const char *content_type(const char *filename) {
+  const char *dot = strrchr(filename, '.');
+  if (dot == NULL) {
+    return "application/octet-stream";
+  }
+
+  struct {
+    const char *ext;
+    const char *mime;
+  } types[] = {{".html", "text/html"},        {".htm", "text/html"},
+               {".css", "text/css"},          {".js", "application/javascript"},
+               {".json", "application/json"}, {".png", "image/png"},
+               {".jpg", "image/jpg"},         {".jpeg", "image/jpeg"},
+               {".gif", "image/gif"},         {".svg", "image/svg+xml"},
+               {".ico", "image/x-icon"},      {".webp", "image/webp"},
+               {".pdf", "application/pdf"},   {".txt", "text/plain"}};
+
+  size_t count = sizeof(types) / sizeof(types[0]);
+  for (size_t i = 0; i < count; i++) {
+    if (strcmp(dot, types[i].ext) == 0) {
+      return types[i].mime;
+    }
+  }
+
+  return "application/octet-stream";
 }
 
 int main(void) {
